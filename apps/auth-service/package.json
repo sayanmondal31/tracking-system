@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.21.0",
+    "redis": "^6.0.0",
+    "uuid": "^14.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/bun": "latest",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.20.0",
+    "@types/uuid": "^11.0.0",
+    "dbmate": "^2.33.0",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "migration:create": "node-pg-migrate create",
+    "migration:up": "node-pg-migrate up",
+    "migration:down": "node-pg-migrate down"
+  },
+  "name": "auth-service",
+  "module": "index.ts",
+  "type": "module"
+}

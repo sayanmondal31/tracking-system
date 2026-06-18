@@ -2,12 +2,13 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 import type { JwtPayload } from "../types/jwt.types";
 import { AppError } from "../errors/AppError";
+import type { IJWTSvc } from "../interface/IJwtSvc.interface";
 
-export class JwtService {
+export class JwtService implements IJWTSvc {
   private readonly accessTokenExpiry = "1m";
   private readonly refreshTokenExpiry = "30d";
 
-  generateAccessToken = (userId: string, email: string) => {
+  generateAccessToken = (userId: string, email: string): string => {
     return jwt.sign(
       {
         sub: userId,
@@ -18,7 +19,7 @@ export class JwtService {
     );
   };
 
-  generateRefreshToken = (userId: string, email: string) => {
+  generateRefreshToken = (userId: string, email: string): string => {
     return jwt.sign(
       {
         sub: userId,

@@ -10,8 +10,9 @@ import { sha256 } from "../utils/hash";
 import { OtpRepository } from "../repositories/otp.repository";
 import { generateOTP } from "../utils/generateOtp";
 import type { VerifyOtpResponse } from "../types/otp.types";
+import type { IAuthSvc } from "../interface/IAuthServer.interface";
 
-export class AuthService {
+export class AuthService implements IAuthSvc {
   private userRepository = new UserRepository();
   private refreshTokenRepository = new RefreshTokenRepository();
   private otpRepository = new OtpRepository();

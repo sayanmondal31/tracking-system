@@ -37,4 +37,14 @@ export class JwtService implements IJWTSvc {
       throw new AppError("Invalid or expired token", 401);
     }
   };
+
+  decodeAccessTokenExp = (token: string): { exp?: number } => {
+    try {
+      const decode = jwt.decode(token) as { exp?: number };
+
+      return decode;
+    } catch (error) {
+      throw new AppError("Invalid or expired token", 401);
+    }
+  };
 }

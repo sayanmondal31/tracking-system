@@ -13,5 +13,5 @@ export interface IAuthSvc {
     refreshToken: string;
   }>;
   verifyOtp(otp: string, email: string): Promise<VerifyOtpResponse>;
-  logout(token: string): Promise<void>;
+  logout(token: string, accessToken: String): Promise<void>;
 }

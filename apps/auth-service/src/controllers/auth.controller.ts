@@ -77,7 +77,11 @@ export class AuthController {
   logout = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
 
-    this.authService.logout(refreshToken);
+    // Extract access token from the Authorization header
+    const authHeader: string = req.headers.authorization || "";
+    const accessToken = authHeader.replace("Bearer ", "");
+
+    this.authService.logout(refreshToken, accessToken);
 
     return res.status(200).json({
       success: true,

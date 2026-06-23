@@ -11,6 +11,7 @@ import { OtpRepository } from "../repositories/otp.repository";
 import { generateOTP } from "../utils/generateOtp";
 import type { VerifyOtpResponse } from "../types/otp.types";
 import type { IAuthSvc } from "../interface/IAuthServer.interface";
+import { redis } from "../config/redis";
 
 export class AuthService implements IAuthSvc {
   private userRepository = new UserRepository();
@@ -143,7 +144,7 @@ export class AuthService implements IAuthSvc {
     } as VerifyOtpResponse;
   };
 
-  logout = async (token: string) => {
+  logout = async (token: string, accessToken: string) => {
     const tokenHaash = sha256(token);
 
     const existingToken =
@@ -154,5 +155,21 @@ export class AuthService implements IAuthSvc {
     }
 
     await this.refreshTokenRepository.deleteByID(existingToken.id);
+
+    // invalidate accesstoken  (redis blacklist)
+    if (accessToken) {
+      //  decode token to get expiry
+      const decoded = this.jwtService.decodeAccessTokenExp(accessToken);
+
+      if (decoded && decoded.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const secondsLeft = decoded.exp - currentTime;
+
+        // Onnly blacklist if token still active
+        if (secondsLeft > 0) {
+          await redis.set(`blacklist:${accessToken}`, "true");
+        }
+      }
+    }
   };
 }

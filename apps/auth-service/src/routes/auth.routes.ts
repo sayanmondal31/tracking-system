@@ -25,6 +25,8 @@ router
   .post(validate(refreshTokenSchema), authController.refresh);
 
 router.route("/verify").post(validate(OtpSchema), authController.verify);
-router.route("/logout").post(validate(logoutSchema), authController.logout);
+router
+  .route("/logout")
+  .post(authenticate, validate(logoutSchema), authController.logout);
 
 export default router;

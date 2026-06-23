@@ -1,6 +1,7 @@
 k8s_yaml('infra/k8s/postgres.yaml')
 k8s_yaml('infra/k8s/redis.yaml')
 k8s_yaml('infra/k8s/auth-service.yaml')
+k8s_yaml('infra/k8s/api-gateway.yaml')
 
 docker_build(
     'auth-service',
@@ -12,4 +13,15 @@ docker_build(
     ]
 )
 
+docker_build(
+    'api-gateway',
+    context='apps/api-gateway',
+    dockerfile='apps/api-gateway/Dockerfile',
+    live_update=[
+        # Sync the local src folder to /app/src inside the container
+        sync('apps/api-gateway', '/app')
+    ]
+)
+
 k8s_resource('auth-service', port_forwards='3001:3001')
+k8s_resource('api-gateway')

@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/sayanmondal31/api-gateway/cache"
 	"github.com/sayanmondal31/api-gateway/config"
 	gwMiddleware "github.com/sayanmondal31/api-gateway/middleware"
@@ -42,6 +43,21 @@ func main() {
 	r.Use(middleware.Logger)    // this logs start and end
 	r.Use(middleware.Recoverer) // recovers from panics
 
+	// CORS
+	r.Use(cors.Handler(cors.Options{
+		// Production: Frontend domain
+		// dev: wildcard
+		AllowedOrigins: []string{"http://localhost:*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User-Id"},
+
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Caches preflight OPTIONS request for 5 mins
+	}))
+
+	r.Use(gwMiddleware.RateLimit(10, 2)) // Rate Limiting (Capacity: 10 tokens, refills at 2 tokens per second)
+
 	// API Gateway healthcheck
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -55,7 +71,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Post("/auth/register", gp.RouteRequest)
 		r.Post("/auth/login", gp.RouteRequest)
-		r.Post("/auth//verify", gp.RouteRequest)
+		r.Post("/auth/verify", gp.RouteRequest)
 		r.Post("/auth/refresh", gp.RouteRequest)
 	})
 

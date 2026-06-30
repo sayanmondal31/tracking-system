@@ -2,7 +2,7 @@ local key = KEYS[1]
 local capacity = tonumber(ARGV[1])
 local refill_rate = tonumber(ARGV[2])
 local now = tonumber(ARGV[3])
-local requested_batch = tonumber(ARGV[4])
+local requested = tonumber(ARGV[4] or 1)
 
 -- Retrieve the current token count and last updated timestamp
 local data = redis.call('HMGET', key, 'tokens', 'last_updated')
@@ -19,14 +19,12 @@ else
     tokens = math.min(capacity, tokens + (elapsed * refill_rate))
 end
 
--- Allow up to requested_batch tokens if available
-local allocated = 0
-if tokens >= 1 then
-    allocated = math.min(tokens, requested_batch)
-    tokens = tokens - allocated
+-- Allow request and deduct a token if possible
+if tokens >= requested then
+    tokens = tokens - requested
     redis.call('HMSET', key, 'tokens', tokens, 'last_updated', now)
     redis.call('EXPIRE', key, 86400) -- Set TTL of 24h to clean up stale client IPs
-
+    return 1 -- Allowed
+else
+    return 0 -- Rate Limited
 end
-
-return allocated -- Return the number of tokens allocated (0 if rate limited)

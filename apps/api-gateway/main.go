@@ -28,6 +28,10 @@ func main() {
 	}
 	fmt.Println("Connected to redis!")
 
+	if err := gwMiddleware.LoadRateLimitScript(); err != nil {
+		log.Fatalf("%v", err)
+	}
+
 	// Initialize gateway proxy
 	gp, err := proxy.NewGatewayProxy(cfg.AuthSvcURL)
 
@@ -56,7 +60,9 @@ func main() {
 		MaxAge:           300, // Caches preflight OPTIONS request for 5 mins
 	}))
 
-	r.Use(gwMiddleware.RateLimit(10, 2)) // Rate Limiting (Capacity: 10 tokens, refills at 2 tokens per second)
+	// r.Use(gwMiddleware.RateLimit(10, 2))   // Rate Limiting (Capacity: 10 tokens, refills at 2 tokens per second)
+	// r.Use(gwMiddleware.RateLimit(1, 0.1))  // Rate Limiting (Capacity: 1 token, refills at 1 token per  10 second = 0.1 tokens/sec)
+	r.Use(gwMiddleware.RateLimit(30, 30/30)) // Rate Limiting (Capacity: 30 tokens, refills at 30/60 = 0.5 tokens per second
 
 	// API Gateway healthcheck
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {

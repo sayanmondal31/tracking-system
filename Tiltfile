@@ -25,3 +25,5 @@ docker_build(
 
 k8s_resource('auth-service', port_forwards='3001:3001')
 k8s_resource('api-gateway')
+k8s_resource('postgres-db', port_forwards='5434:5432')
+k8s_resource('redis-cache', port_forwards='63799:6379')

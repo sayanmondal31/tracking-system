@@ -12,7 +12,7 @@ type Config struct {
 
 func Load() *Config {
 	Port := getEnv("PORT", "3000")
-	RedisURL := getEnv("REDIS_URL", "redis://localhost:6379")
+	RedisURL := getEnv("REDIS_URL", "redis://localhost:63799")
 	AuthSvcURL := getEnv("AUTH_SERVICE_URL", "http://localhost:3001")
 	JWTSecret := getEnv("JWT_SECRET", "")
 
